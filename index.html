@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess - Project</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
+    <script>
+        function setup() {
+            let canvas = createCanvas(600, 600);
+            noStroke();
+            background(0)
+            canvas.style('border', '5px solid black');
+        }
+
+        function draw() {
+            //variabila d este pentru deplasarea verticală, în timp ce i și j sunt pentru desenarea modelului
+            for (let i = 0, d = 1; i < 8; i++) {   //bucla orizontala
+                for (let j = 0; j < 8; j++) {   // bucla verticala
+                    if (j % 2 != 0) {
+                        fill(255)
+                        rect(i * (width / 8), j * (height / 8) - d * (height / 8), width / 8, height / 8);
+                    }
+                }
+                if (i % 2 != 0) {
+                    d = 1
+                } else {
+                    d = 0
+                }
+            }
+
+        }
+
+    </script>
+</body>
+
+</html>
+
+
+
+<!-- <body>
+    
+     <script>
+
+        function draw() {
+            background("white")
+            //Curs 5 
+            testArray()
+
+
+        }
+
+
+        function testArray() {
+
+            //     let mySquares1 = [100, 160, 220, 280, 340, 400, 460, 520]
+            // let myColors1 = ["white", "black", "white", "black", "white", "black", "white", "black"]
+            // let mySquares2 = [100, 160, 220, 280, 340, 400, 460, 520]
+            // let myColors2 = ["white", "black", "white", "black", "white", "black", "white", "black"]
+
+
+            let myMatrix = []
+            for (let i = 0; i < 8; i++) {
+                myMatrix.push([100, 160, 220, 280, 340, 400, 460, 520])
+            }
+
+            // [[100, 160, 220, 280, 340, 400, 460, 520],
+            // [100, 160, 220, 280, 340, 400, 460, 520],
+            // [100, 160, 220, 280, 340, 400, 460, 520],
+            // [100, 160, 220, 280, 340, 400, 460, 520],
+            // [100, 160, 220, 280, 340, 400, 460, 520],
+            // [100, 160, 220, 280, 340, 400, 460, 520],
+            // [100, 160, 220, 280, 340, 400, 460, 520],
+            // [100, 160, 220, 280, 340, 400, 460, 520]];
+
+
+
+            myMatrixColors = [["white", "black", "white", "black", "white", "black", "white", "black"],
+            ["black", "white", "black", "white", "black", "white", "black", "white"],
+            ["white", "black", "white", "black", "white", "black", "white", "black"],
+            ["black", "white", "black", "white", "black", "white", "black", "white"],
+            ["white", "black", "white", "black", "white", "black", "white", "black"],
+            ["black", "white", "black", "white", "black", "white", "black", "white"],
+            ["white", "black", "white", "black", "white", "black", "white", "black"],
+            ["black", "white", "black", "white", "black", "white", "black", "white"]
+            ];
+
+
+            let squareY = 250
+            myMatrix.forEach((lineArray, lineIndex) => {
+                lineArray.forEach((squareX, colIndex) => {
+                    fill(myMatrixColors[lineIndex][colIndex])
+                    square(squareX, squareY, 50)
+                })
+                squareY += 60
+            })
+        }
+    </script> -->
