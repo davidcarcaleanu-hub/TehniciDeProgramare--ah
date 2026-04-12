@@ -13,8 +13,37 @@
 <body>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
     <script>
+        //matricea pentru piese
+        //piesele albe sunt notate cu a_piesa
+        //piesele negre sunt notate cu n_piesa
+        let matricePiese = [
+            ['n_tura', 'n_cal', 'n_nebun', 'n_regina', 'n_rege', 'n_nebun', 'n_cal', 'n_tura' ],
+            ['n_pion', 'n_pion', 'n_pion', 'n_pion', 'n_pion', 'n_pion', 'n_pion', 'n_pion' ],
+            [null,      null,     null,     null,     null,     null,     null,     null ],
+            [null,      null,     null,     null,     null,     null,     null,     null ],
+            [null,      null,     null,     null,     null,     null,     null,     null ],
+            [null,      null,     null,     null,     null,     null,     null,     null ],
+            ['a_pion', 'a_pion', 'a_pion', 'a_pion', 'a_pion', 'a_pion', 'a_pion', 'a_pion' ],
+            ['a_tura', 'a_cal', 'a_nebun', 'a_regina', 'a_rege', 'a_nebun', 'a_cal', 'a_tura' ]
+            
+        ]
+        let img = {};
+        function preload() {
+            img['n_pion'] = loadImage('black/n_pion.png')
+            img['n_tura'] = loadImage('black/n_tura.png')
+            img['n_cal'] = loadImage('black/n_cal.png')
+            img['n_nebun'] = loadImage('black/n_nebun.png')
+            img['n_rege'] = loadImage('black/n_rege.png')
+            img['n_regina'] = loadImage('black/n_regina.png')
+            img['a_pion'] = loadImage('white/a_pion.png')
+            img['a_tura'] = loadImage('white/a_tura.png')
+            img['a_cal'] = loadImage('white/a_cal.png')
+            img['a_nebun'] = loadImage('white/a_nebun.png')
+            img['a_rege'] = loadImage('white/a_rege.png')
+            img['a_regina'] = loadImage('white/a_regina.png')
+        }
         function setup() {
-            let canvas = createCanvas(600, 600);
+            let canvas = createCanvas(600, 570);
             noStroke();
             background(0)
             canvas.style('border', '5px solid black');
@@ -35,6 +64,14 @@
                     d = 0
                 }
             }
+            //desenarea pieselor pe tabla de sah
+            matricePiese.forEach((row, rowIndex) => {
+                row.forEach((piece, colIndex) => {
+                    if (piece !== null) {
+                        image(img[piece], colIndex * (width / 8), rowIndex * (height / 8), width / 8, height / 8)
+                    }
+                })
+            });
 
         }
 
