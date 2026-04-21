@@ -16,17 +16,32 @@
         //matricea pentru piese
         //piesele albe sunt notate cu a_piesa
         //piesele negre sunt notate cu n_piesa
-        let matricePiese = [
-            ['n_tura', 'n_cal', 'n_nebun', 'n_regina', 'n_rege', 'n_nebun', 'n_cal', 'n_tura' ],
-            ['n_pion', 'n_pion', 'n_pion', 'n_pion', 'n_pion', 'n_pion', 'n_pion', 'n_pion' ],
-            [null,      null,     null,     null,     null,     null,     null,     null ],
-            [null,      null,     null,     null,     null,     null,     null,     null ],
-            [null,      null,     null,     null,     null,     null,     null,     null ],
-            [null,      null,     null,     null,     null,     null,     null,     null ],
-            ['a_pion', 'a_pion', 'a_pion', 'a_pion', 'a_pion', 'a_pion', 'a_pion', 'a_pion' ],
-            ['a_tura', 'a_cal', 'a_nebun', 'a_regina', 'a_rege', 'a_nebun', 'a_cal', 'a_tura' ]
-            
-        ]
+       const Piece = {
+        row: 0,
+        column: 0,
+        type: null,
+        color: null,
+
+        init: function(row, column, type, color){
+            this.row = row
+            this.column = column
+            this.type = type
+            this.color = color
+        },
+        draw: function () {
+            let square = width/8;
+            let ChessPiece = this.color + "_" + this.type
+            image(img[ChessPiece], this.column * square, this.row * square, square, square)
+        },
+
+        checkIfCliked: function (mouseX, mouseY){
+            let square = width/8
+            return(
+                (mouseX >= this.column * square && mouseX <= this.column * square + square)&&
+                (mouseY >= this.row * square && mouseY <= this.row * square + square)
+            )
+        }
+       }
         let img = {};
         function preload() {
             img['n_pion'] = loadImage('black/n_pion.png')
@@ -42,11 +57,40 @@
             img['a_rege'] = loadImage('white/a_rege.png')
             img['a_regina'] = loadImage('white/a_regina.png')
         }
+        function initPieces() {
+            pieces = []
+            let back_row = ["tura", "cal", "nebun", "regina", "rege", "nebun", "cal", "tura"]
+
+            for(let col = 0; col < 8; col++){ // => pentru piesele negre
+                let p = Object.create(Piece);
+                p.init(0, col, back_row[col], "n") //n se refera la negru
+                pieces.push(p)
+
+                let p2 = Object.create(Piece);
+                p2.init(1, col, "pion", "n")
+                pieces.push(p2)
+                
+
+            }
+
+            for(let col = 0; col < 8; col++){ // => pentru piesele albe
+                let p = Object.create(Piece);
+                p.init(6, col, "pion", "a") // a se referea la alb
+                pieces.push(p)
+
+                let p2 = Object.create(Piece);
+                p2.init(7, col, back_row[col], "a")
+                pieces.push(p2)
+            }
+
+
+        }
         function setup() {
-            let canvas = createCanvas(600, 570);
+            let canvas = createCanvas(570, 570);
             noStroke();
             background(0)
             canvas.style('border', '5px solid black');
+            initPieces();
         }
 
         function draw() {
@@ -64,15 +108,11 @@
                     d = 0
                 }
             }
-            //desenarea pieselor pe tabla de sah
-            matricePiese.forEach((row, rowIndex) => {
-                row.forEach((piece, colIndex) => {
-                    if (piece !== null) {
-                        image(img[piece], colIndex * (width / 8), rowIndex * (height / 8), width / 8, height / 8)
-                    }
-                })
-            });
 
+            for (let i = 0; i < pieces.length; i++){
+                pieces[i].draw()
+            }
+            
         }
 
     </script>
