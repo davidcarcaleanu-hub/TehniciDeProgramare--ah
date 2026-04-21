@@ -1,126 +1,192 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chess - Project</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-</head>
-
-<body>
+  <body>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
     <script>
-        //matricea pentru piese
-        //piesele albe sunt notate cu a_piesa
-        //piesele negre sunt notate cu n_piesa
-       const Piece = {
+      //matricea pentru piese
+      //piesele albe sunt notate cu a_piesa
+      //piesele negre sunt notate cu n_piesa
+      const Piece = {
         row: 0,
         column: 0,
         type: null,
         color: null,
 
-        init: function(row, column, type, color){
-            this.row = row
-            this.column = column
-            this.type = type
-            this.color = color
+        init: function (row, column, type, color) {
+          this.row = row;
+          this.column = column;
+          this.type = type;
+          this.color = color;
         },
         draw: function () {
-            let square = width/8;
-            let ChessPiece = this.color + "_" + this.type
-            image(img[ChessPiece], this.column * square, this.row * square, square, square)
+          let square = width / 8;
+          let ChessPiece = this.color + "_" + this.type;
+          image(
+            img[ChessPiece],
+            this.column * square,
+            this.row * square,
+            square,
+            square,
+          );
         },
 
-        checkIfCliked: function (mouseX, mouseY){
-            let square = width/8
-            return(
-                (mouseX >= this.column * square && mouseX <= this.column * square + square)&&
-                (mouseY >= this.row * square && mouseY <= this.row * square + square)
-            )
+        checkIfCliked: function (mouseX, mouseY) {
+          let square = width / 8;
+          return (
+            mouseX >= this.column * square &&
+            mouseX <= this.column * square + square &&
+            mouseY >= this.row * square &&
+            mouseY <= this.row * square + square
+          );
+        },
+      };
+      let img = {};
+      let pieces = [];
+      let selectedPiece = null;
+      function preload() {
+        img["n_pion"] = loadImage("black/n_pion.png");
+        img["n_tura"] = loadImage("black/n_tura.png");
+        img["n_cal"] = loadImage("black/n_cal.png");
+        img["n_nebun"] = loadImage("black/n_nebun.png");
+        img["n_rege"] = loadImage("black/n_rege.png");
+        img["n_regina"] = loadImage("black/n_regina.png");
+        img["a_pion"] = loadImage("white/a_pion.png");
+        img["a_tura"] = loadImage("white/a_tura.png");
+        img["a_cal"] = loadImage("white/a_cal.png");
+        img["a_nebun"] = loadImage("white/a_nebun.png");
+        img["a_rege"] = loadImage("white/a_rege.png");
+        img["a_regina"] = loadImage("white/a_regina.png");
+      }
+
+      function initPieces() {
+        pieces = [];
+        let back_row = [
+          "tura",
+          "cal",
+          "nebun",
+          "regina",
+          "rege",
+          "nebun",
+          "cal",
+          "tura",
+        ];
+
+        for (let col = 0; col < 8; col++) {
+          // => pentru piesele negre
+          let p = Object.create(Piece);
+          p.init(0, col, back_row[col], "n"); //n se refera la negru
+          pieces.push(p);
+
+          let p2 = Object.create(Piece);
+          p2.init(1, col, "pion", "n");
+          pieces.push(p2);
         }
-       }
-        let img = {};
-        function preload() {
-            img['n_pion'] = loadImage('black/n_pion.png')
-            img['n_tura'] = loadImage('black/n_tura.png')
-            img['n_cal'] = loadImage('black/n_cal.png')
-            img['n_nebun'] = loadImage('black/n_nebun.png')
-            img['n_rege'] = loadImage('black/n_rege.png')
-            img['n_regina'] = loadImage('black/n_regina.png')
-            img['a_pion'] = loadImage('white/a_pion.png')
-            img['a_tura'] = loadImage('white/a_tura.png')
-            img['a_cal'] = loadImage('white/a_cal.png')
-            img['a_nebun'] = loadImage('white/a_nebun.png')
-            img['a_rege'] = loadImage('white/a_rege.png')
-            img['a_regina'] = loadImage('white/a_regina.png')
+
+        for (let col = 0; col < 8; col++) {
+          // => pentru piesele albe
+          let p = Object.create(Piece);
+          p.init(6, col, "pion", "a"); // a se referea la alb
+          pieces.push(p);
+
+          let p2 = Object.create(Piece);
+          p2.init(7, col, back_row[col], "a");
+          pieces.push(p2);
         }
-        function initPieces() {
-            pieces = []
-            let back_row = ["tura", "cal", "nebun", "regina", "rege", "nebun", "cal", "tura"]
+      }
+      function setup() {
+        let canvas = createCanvas(570, 570);
+        noStroke();
+        background(0);
+        canvas.style("border", "5px solid black");
+        initPieces();
+      }
 
-            for(let col = 0; col < 8; col++){ // => pentru piesele negre
-                let p = Object.create(Piece);
-                p.init(0, col, back_row[col], "n") //n se refera la negru
-                pieces.push(p)
-
-                let p2 = Object.create(Piece);
-                p2.init(1, col, "pion", "n")
-                pieces.push(p2)
-                
-
+      function draw() {
+        //variabila d este pentru deplasarea verticală, în timp ce i și j sunt pentru desenarea modelului
+        background(0);
+        for (let i = 0, d = 1; i < 8; i++) {
+          //bucla orizontala
+          for (let j = 0; j < 8; j++) {
+            // bucla verticala
+            if (j % 2 != 0) {
+              fill(255);
+              rect(
+                i * (width / 8),
+                j * (height / 8) - d * (height / 8),
+                width / 8,
+                height / 8,
+              );
             }
-
-            for(let col = 0; col < 8; col++){ // => pentru piesele albe
-                let p = Object.create(Piece);
-                p.init(6, col, "pion", "a") // a se referea la alb
-                pieces.push(p)
-
-                let p2 = Object.create(Piece);
-                p2.init(7, col, back_row[col], "a")
-                pieces.push(p2)
-            }
-
-
-        }
-        function setup() {
-            let canvas = createCanvas(570, 570);
-            noStroke();
-            background(0)
-            canvas.style('border', '5px solid black');
-            initPieces();
+          }
+          if (i % 2 != 0) {
+            d = 1;
+          } else {
+            d = 0;
+          }
         }
 
-        function draw() {
-            //variabila d este pentru deplasarea verticală, în timp ce i și j sunt pentru desenarea modelului
-            for (let i = 0, d = 1; i < 8; i++) {   //bucla orizontala
-                for (let j = 0; j < 8; j++) {   // bucla verticala
-                    if (j % 2 != 0) {
-                        fill(255)
-                        rect(i * (width / 8), j * (height / 8) - d * (height / 8), width / 8, height / 8);
-                    }
-                }
-                if (i % 2 != 0) {
-                    d = 1
-                } else {
-                    d = 0
-                }
-            }
-
-            for (let i = 0; i < pieces.length; i++){
-                pieces[i].draw()
-            }
-            
+        if (selectedPiece) { //coloreaza fundalul casutei cu galben in momentul in care selectam o piesa
+          let square = width / 8;
+          fill(255, 255, 0, 150);
+          rect(
+            selectedPiece.column * square,
+            selectedPiece.row * square,
+            square,
+            square,
+          );
         }
 
+        for (let i = 0; i < pieces.length; i++) { //deseneaza piesele pe tabla
+          pieces[i].draw();
+        }
+      }
+
+      function mousePressed() { // pentru a muta piesele
+        let square = width / 8;
+        let clickedColumn = Math.floor(mouseX / square);
+        let clickedRow = Math.floor(mouseY / square);
+        let clickedPiece = null;
+
+        for (let i = 0; i < pieces.length; i++) { //ia fiecare piesa si spune daca a fost selectata
+          if (pieces[i].checkIfCliked(mouseX, mouseY)) {
+            clickedPiece = pieces[i]; //piesa este salvata in aici
+            break;
+          }
+        }
+
+        if (clickedPiece) {
+          if (clickedPiece === selectedPiece) { //selectarea si deselectarea unei piese
+            selectedPiece = null;
+          } else if ( //mutarea unei piese si capturarea pieselor de culoare opusa
+            selectedPiece &&
+            selectedPiece.color !== clickedPiece.color
+          ) {
+            selectedPiece.column = clickedColumn;
+            selectedPiece.row = clickedRow;
+            pieces.splice(pieces.indexOf(clickedPiece), 1);
+            selectedPiece = null;
+          } else { 
+            selectedPiece = clickedPiece;
+          }
+        } else { //mutarea pe o casuta libera
+          if (selectedPiece) {
+            selectedPiece.column = clickedColumn;
+            selectedPiece.row = clickedRow;
+            selectedPiece = null;
+          }
+        }
+      }
     </script>
-</body>
-
+  </body>
 </html>
-
-
 
 <!-- <body>
     
