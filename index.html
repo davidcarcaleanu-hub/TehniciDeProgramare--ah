@@ -1,16 +1,50 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chess - Project</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
 
-  <body>
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
-    <script>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chess - Project</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
+  <script>
+    function setup() {
+      createCanvas(windowWidth, windowHeight)
+    }
+    function draw() {
+      testArray()
+    }
+    function testArray() {
+      let squareSize = 80;
+      let boardSize = squareSize * 8;
+      let startX = (windowWidth - boardSize) / 2
+      let startY = (windowHeight - boardSize) / 2
+
+
+      let myMatrixColors = [["white", "black", "white", "black", "white", "black", "white", "black"],
+      ["black", "white", "black", "white", "black", "white", "black", "white"],
+      ["white", "black", "white", "black", "white", "black", "white", "black"],
+      ["black", "white", "black", "white", "black", "white", "black", "white"],
+      ["white", "black", "white", "black", "white", "black", "white", "black"],
+      ["black", "white", "black", "white", "black", "white", "black", "white"],
+      ["white", "black", "white", "black", "white", "black", "white", "black"],
+      ["black", "white", "black", "white", "black", "white", "black", "white"]
+      ];
+
+
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          fill(myMatrixColors[row][col]);
+          let x = startX + col * squareSize;
+          let y = startY + row * squareSize;
+          square(x, y, squareSize)
+        }
+      }
+
       //matricea pentru piese
       //piesele albe sunt notate cu a_piesa
       //piesele negre sunt notate cu n_piesa
@@ -102,147 +136,89 @@
         }
       }
       function setup() {
-        let canvas = createCanvas(570, 570);
+        // let canvas = createCanvas(570, 570);
         noStroke();
         background(0);
         canvas.style("border", "5px solid black");
         initPieces();
       }
 
-      function draw() {
-        //variabila d este pentru deplasarea verticală, în timp ce i și j sunt pentru desenarea modelului
-        background(0);
-        for (let i = 0, d = 1; i < 8; i++) {
-          //bucla orizontala
-          for (let j = 0; j < 8; j++) {
-            // bucla verticala
-            if (j % 2 != 0) {
-              fill(255);
-              rect(
-                i * (width / 8),
-                j * (height / 8) - d * (height / 8),
-                width / 8,
-                height / 8,
-              );
-            }
-          }
-          if (i % 2 != 0) {
-            d = 1;
-          } else {
-            d = 0;
-          }
-        }
+      // function draw() {
+      //   //variabila d este pentru deplasarea verticală, în timp ce i și j sunt pentru desenarea modelului
+      //   background(0);
+      //   for (let i = 0, d = 1; i < 8; i++) {
+      //     //bucla orizontala
+      //     for (let j = 0; j < 8; j++) {
+      //       // bucla verticala
+      //       if (j % 2 != 0) {
+      //         fill(255);
+      //         rect(
+      //           i * (width / 8),
+      //           j * (height / 8) - d * (height / 8),
+      //           width / 8,
+      //           height / 8,
+      //         );
+      //       }
+      //     }
+      //     if (i % 2 != 0) {
+      //       d = 1;
+      //     } else {
+      //       d = 0;
+      //     }
+      //   }
 
-        if (selectedPiece) { //coloreaza fundalul casutei cu galben in momentul in care selectam o piesa
-          let square = width / 8;
-          fill(255, 255, 0, 150);
-          rect(
-            selectedPiece.column * square,
-            selectedPiece.row * square,
-            square,
-            square,
-          );
-        }
-
-        for (let i = 0; i < pieces.length; i++) { //deseneaza piesele pe tabla
-          pieces[i].draw();
-        }
-      }
-
-      function mousePressed() { // pentru a muta piesele
+      if (selectedPiece) { //coloreaza fundalul casutei cu galben in momentul in care selectam o piesa
         let square = width / 8;
-        let clickedColumn = Math.floor(mouseX / square);
-        let clickedRow = Math.floor(mouseY / square);
-        let clickedPiece = null;
+        fill(255, 255, 0, 150);
+        rect(
+          selectedPiece.column * square,
+          selectedPiece.row * square,
+          square,
+          square,
+        );
+      }
 
-        for (let i = 0; i < pieces.length; i++) { //ia fiecare piesa si spune daca a fost selectata
-          if (pieces[i].checkIfCliked(mouseX, mouseY)) {
-            clickedPiece = pieces[i]; //piesa este salvata in aici
-            break;
-          }
-        }
+      for (let i = 0; i < pieces.length; i++) { //deseneaza piesele pe tabla
+        pieces[i].draw();
+      }
+    }
 
-        if (clickedPiece) {
-          if (clickedPiece === selectedPiece) { //selectarea si deselectarea unei piese
-            selectedPiece = null;
-          } else if ( //mutarea unei piese si capturarea pieselor de culoare opusa
-            selectedPiece &&
-            selectedPiece.color !== clickedPiece.color
-          ) {
-            selectedPiece.column = clickedColumn;
-            selectedPiece.row = clickedRow;
-            pieces.splice(pieces.indexOf(clickedPiece), 1);
-            selectedPiece = null;
-          } else { 
-            selectedPiece = clickedPiece;
-          }
-        } else { //mutarea pe o casuta libera
-          if (selectedPiece) {
-            selectedPiece.column = clickedColumn;
-            selectedPiece.row = clickedRow;
-            selectedPiece = null;
-          }
+    function mousePressed() { // pentru a muta piesele
+      let square = width / 8;
+      let clickedColumn = Math.floor(mouseX / square);
+      let clickedRow = Math.floor(mouseY / square);
+      let clickedPiece = null;
+
+      for (let i = 0; i < pieces.length; i++) { //ia fiecare piesa si spune daca a fost selectata
+        if (pieces[i].checkIfCliked(mouseX, mouseY)) {
+          clickedPiece = pieces[i]; //piesa este salvata in aici
+          break;
         }
       }
-    </script>
-  </body>
+
+      if (clickedPiece) {
+        if (clickedPiece === selectedPiece) { //selectarea si deselectarea unei piese
+          selectedPiece = null;
+        } else if ( //mutarea unei piese si capturarea pieselor de culoare opusa
+          selectedPiece &&
+          selectedPiece.color !== clickedPiece.color
+        ) {
+          selectedPiece.column = clickedColumn;
+          selectedPiece.row = clickedRow;
+          pieces.splice(pieces.indexOf(clickedPiece), 1);
+          selectedPiece = null;
+        } else {
+          selectedPiece = clickedPiece;
+        }
+      } else { //mutarea pe o casuta libera
+        if (selectedPiece) {
+          selectedPiece.column = clickedColumn;
+          selectedPiece.row = clickedRow;
+          selectedPiece = null;
+        }
+      }
+    }
+  </script>
+</body>
+
 </html>
-
-<!-- <body>
-    
-     <script>
-
-        function draw() {
-            background("white")
-            //Curs 5 
-            testArray()
-
-
-        }
-
-
-        function testArray() {
-
-            //     let mySquares1 = [100, 160, 220, 280, 340, 400, 460, 520]
-            // let myColors1 = ["white", "black", "white", "black", "white", "black", "white", "black"]
-            // let mySquares2 = [100, 160, 220, 280, 340, 400, 460, 520]
-            // let myColors2 = ["white", "black", "white", "black", "white", "black", "white", "black"]
-
-
-            let myMatrix = []
-            for (let i = 0; i < 8; i++) {
-                myMatrix.push([100, 160, 220, 280, 340, 400, 460, 520])
-            }
-
-            // [[100, 160, 220, 280, 340, 400, 460, 520],
-            // [100, 160, 220, 280, 340, 400, 460, 520],
-            // [100, 160, 220, 280, 340, 400, 460, 520],
-            // [100, 160, 220, 280, 340, 400, 460, 520],
-            // [100, 160, 220, 280, 340, 400, 460, 520],
-            // [100, 160, 220, 280, 340, 400, 460, 520],
-            // [100, 160, 220, 280, 340, 400, 460, 520],
-            // [100, 160, 220, 280, 340, 400, 460, 520]];
-
-
-
-            myMatrixColors = [["white", "black", "white", "black", "white", "black", "white", "black"],
-            ["black", "white", "black", "white", "black", "white", "black", "white"],
-            ["white", "black", "white", "black", "white", "black", "white", "black"],
-            ["black", "white", "black", "white", "black", "white", "black", "white"],
-            ["white", "black", "white", "black", "white", "black", "white", "black"],
-            ["black", "white", "black", "white", "black", "white", "black", "white"],
-            ["white", "black", "white", "black", "white", "black", "white", "black"],
-            ["black", "white", "black", "white", "black", "white", "black", "white"]
-            ];
-
-
-            let squareY = 250
-            myMatrix.forEach((lineArray, lineIndex) => {
-                lineArray.forEach((squareX, colIndex) => {
-                    fill(myMatrixColors[lineIndex][colIndex])
-                    square(squareX, squareY, 50)
-                })
-                squareY += 60
-            })
-        }
-    </script> -->
