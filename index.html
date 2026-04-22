@@ -86,17 +86,6 @@
           square,
         );
       },
-
-      checkIfClicked: function (callback) {
-        if (
-          (mouseX >= this.x &&
-            mouseX <= this.x + this.width) &&
-          (mouseY >= this.y &&
-            mouseY <= this.y + this.height)
-        ) {
-          callback();
-        }
-      }
     }
 
 
@@ -202,11 +191,11 @@
         let square = squareSize;
         fill(255, 255, 0, 150);
         rect(
-          offsetX + selectedPiece.column * square,
-          offsetY + selectedPiece.row * square,
-          square,
-          square,
-        );
+          offsetX + selectedPiece.column * squareSize,
+          offsetY + selectedPiece.row * squareSize,
+          squareSize,
+          squareSize,
+        )
       }
 
       for (let i = 0; i < pieces.length; i++) {
@@ -218,15 +207,6 @@
 
 
     function mousePressed() { // pentru a muta piesele
-      let square = squareSize;
-      if (
-        mouseX < offsetX || mouseX > offsetX + boardSize ||
-        mouseY < offsetY || mouseY > offsetY + boardSize
-      ) {
-        return;
-      }
-      let clickedColumn = Math.floor((mouseX - offsetX) / squareSize);
-      let clickedRow = Math.floor((mouseY - offsetY) / squareSize);
 
       restartButton.checkIfClicked(() => {   //cand se apasa butonul Restart, se revine la forma initiala
 
@@ -246,9 +226,16 @@
         whiteName = "";
         console.log("Hello")
 
-      });
-
-
+      }
+      
+    );
+       if(mouseX < offsetX || mouseX > offsetX + boardSize ||
+        mouseY < offsetY || mouseY > mouseY + boardSize
+       ){
+        return;
+       }
+      let clickedColumn = Math.floor((mouseX - offsetX) / squareSize)
+      let clickedRow = Math.floor((mouseY - offsetY) / squareSize)
       let clickedPiece = null;
       // for (let i = 0; i < pieces.length; i++) { //ia fiecare piesa si spune daca a fost selectata
       //   if (pieces[i].checkIfCliked(mouseX, mouseY)) {
