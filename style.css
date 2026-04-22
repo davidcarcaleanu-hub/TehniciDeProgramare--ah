@@ -17,7 +17,7 @@ body {
 .top-header {
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
   padding: 9px 0;
   position: absolute;
@@ -34,14 +34,8 @@ body {
   position: absolute;
   font-size: 20px;
   font-weight: bold;
+  color: white;
 }
-
 .top-left {
-  top: 10px;
-  left: 10px;
-}
-
-.bottom-left {
-  bottom: 10px;
-  left: 10px;
+  color: brown;
 }

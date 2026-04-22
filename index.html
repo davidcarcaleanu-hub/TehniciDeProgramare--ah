@@ -13,6 +13,13 @@
   <header class="top-header">
     <img src="Sah2.jpeg" alt="chess header">
   </header>
+
+  <div class="game-wrapper">
+    <div class="name top-left">Jucător Negru</div>
+    <div id="canvas-holder"></div>
+    <div class="name bottom-left">Jucător Alb</div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
   <script>
     //matricea pentru piese
@@ -107,14 +114,15 @@
     }
     function setup() {
       let canvas = createCanvas(570, 570);
+      canvas.parent("canvas-holder");
       noStroke();
       background(0);
-      canvas.style("border", "5px solid black");
       initPieces();
     }
 
     function draw() {
       //variabila d este pentru deplasarea verticală, în timp ce i și j sunt pentru desenarea modelului
+
       background(0);
       for (let i = 0, d = 1; i < 8; i++) {
         //bucla orizontala
@@ -135,6 +143,7 @@
         } else {
           d = 0;
         }
+
       }
 
       if (selectedPiece) { //coloreaza fundalul casutei cu galben in momentul in care selectam o piesa
@@ -151,6 +160,21 @@
       for (let i = 0; i < pieces.length; i++) { //deseneaza piesele pe tabla
         pieces[i].draw();
       }
+      updateNames()
+    }
+    function updateNames() {
+      let topName = document.querySelector(".top-left");
+      let bottomName = document.querySelector(".bottom-left")
+
+      let canvas = document.querySelector("#canvas-holder canvas");
+      let rect = canvas.getBoundingClientRect()
+
+      topName.style.left = rect.left + "px";
+      topName.style.top = (rect.top - 40) + "px";
+
+      bottomName.style.left = rect.left + "px";
+      bottomName.style.top = (rect.bottom + 10) + "px";
+
     }
 
     function mousePressed() { // pentru a muta piesele
@@ -189,6 +213,7 @@
       }
     }
   </script>
+
 </body>
 
 </html>
