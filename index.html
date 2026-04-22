@@ -15,9 +15,9 @@
   </header>
 
   <div class="game-wrapper">
-    <div class="name top-left">Jucător Negru</div>
+    <input id="playerBlack" placeholder="Nume Jucător Negru" />
     <div id="canvas-holder"></div>
-    <div class="name bottom-left">Jucător Alb</div>
+    <input id="playerWhite" placeholder="Nume Jucător Alb" />
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
@@ -25,6 +25,34 @@
     //matricea pentru piese
     //piesele albe sunt notate cu a_piesa
     //piesele negre sunt notate cu n_piesa
+    const Button = {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      color: "white",
+      text: "null",
+      textColor: "black",
+      textPadding: 20,
+      init: function (x, y, width, height, color, text) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.color = color;
+        this.text = text;
+      },
+      draw: function () {
+        fill(this.color);
+        rect(this.x, this.y, this.width, this.height);
+
+        fill(this.textColor);
+        text(this.text, this.x + this.textPadding, this.y + this.textPadding);
+      },
+
+    }
+    const restartButton = Object.create(Button);
+    restartButton.init(235, 520, 100, 30, "white", "RESTART")
     const Piece = {
       row: 0,
       column: 0,
@@ -49,16 +77,23 @@
         );
       },
 
-      checkIfCliked: function (mouseX, mouseY) {
-        let square = width / 8;
-        return (
-          mouseX >= this.column * square &&
-          mouseX <= this.column * square + square &&
-          mouseY >= this.row * square &&
-          mouseY <= this.row * square + square
-        );
-      },
-    };
+      checkIfCliked: function (callback) {
+        if (
+          (mouseX >= this.x &&
+            mouseX <= this.x + this.width) &&
+          (mouseY >= this.y &&
+            mouseY <= this.y + this.heigh)
+        ) {
+          callback();
+        }
+
+      }
+
+
+
+    }
+
+
     let img = {};
     let pieces = [];
     let selectedPiece = null;
@@ -113,11 +148,12 @@
       }
     }
     function setup() {
-      let canvas = createCanvas(570, 570);
+      let canvas = createCanvas(560, 560);
       canvas.parent("canvas-holder");
       noStroke();
       background(0);
       initPieces();
+
     }
 
     function draw() {
@@ -160,27 +196,37 @@
       for (let i = 0; i < pieces.length; i++) { //deseneaza piesele pe tabla
         pieces[i].draw();
       }
-      updateNames()
+      restartButton.draw();
+      //updateNames()
     }
-    function updateNames() {
-      let topName = document.querySelector(".top-left");
-      let bottomName = document.querySelector(".bottom-left")
+    // function updateNames() {
+    //   let topName = document.querySelector(".top-left");
+    //   let bottomName = document.querySelector(".bottom-left")
 
-      let canvas = document.querySelector("#canvas-holder canvas");
-      let rect = canvas.getBoundingClientRect()
+    //   let canvas = document.querySelector("#canvas-holder canvas");
+    //   let rect = canvas.getBoundingClientRect()
 
-      topName.style.left = rect.left + "px";
-      topName.style.top = (rect.top - 40) + "px";
 
-      bottomName.style.left = rect.left + "px";
-      bottomName.style.top = (rect.bottom + 10) + "px";
+    //   topName.style.left = rect.left + "px";
+    //   topName.style.top = (rect.top - 40) + "px";
 
-    }
+    //   bottomName.style.left = rect.left + "px";
+    //   bottomName.style.top = (rect.bottom + 10) + "px";
+
+    // }
+
 
     function mousePressed() { // pentru a muta piesele
       let square = width / 8;
       let clickedColumn = Math.floor(mouseX / square);
       let clickedRow = Math.floor(mouseY / square);
+
+      if (restartButton.checkIfCliked(mouseX, mouseY)) {
+        initPieces();
+        selectedPiece = null;
+        return
+      }
+
       let clickedPiece = null;
 
       for (let i = 0; i < pieces.length; i++) { //ia fiecare piesa si spune daca a fost selectata
@@ -212,6 +258,17 @@
         }
       }
     }
+    function lockInputOnEnter(id) {
+      document.getElementById(id).addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          this.disabled = true;
+        }
+      });
+    }
+    lockInputOnEnter("playerBlack")
+    lockInputOnEnter("playerWhite")
+
+
   </script>
 
 </body>
