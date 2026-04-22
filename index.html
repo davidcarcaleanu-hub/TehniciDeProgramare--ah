@@ -50,9 +50,19 @@
         text(this.text, this.x + this.textPadding, this.y + this.textPadding);
       },
 
+      checkIfClicked: function (callback) {    //dimensiunile butonului
+        if (
+          (mouseX >= this.x && mouseX <= this.x + this.width) &&
+          (mouseY >= this.y && mouseY <= this.y + this.height)
+        ) {
+          callback();
+        }
+      }
+
     }
     const restartButton = Object.create(Button);
-    restartButton.init(235, 520, 100, 30, "white", "RESTART")
+    restartButton.init(305, 660, 100, 30, "white", "RESTART")
+
     const Piece = {
       row: 0,
       column: 0,
@@ -66,37 +76,39 @@
         this.color = color;
       },
       draw: function () {
-        let square = width / 8;
+        let square = squareSize;
         let ChessPiece = this.color + "_" + this.type;
         image(
           img[ChessPiece],
-          this.column * square,
-          this.row * square,
+          offsetX + this.column * square,
+          offsetY + this.row * square,
           square,
           square,
         );
       },
 
-      checkIfCliked: function (callback) {
+      checkIfClicked: function (callback) {
         if (
           (mouseX >= this.x &&
             mouseX <= this.x + this.width) &&
           (mouseY >= this.y &&
-            mouseY <= this.y + this.heigh)
+            mouseY <= this.y + this.height)
         ) {
           callback();
         }
-
       }
-
-
-
     }
 
 
     let img = {};
     let pieces = [];
     let selectedPiece = null;
+    let boardSize = 600;
+    let squareSize = boardSize / 8
+    let offsetX;
+    let offsetY;
+    let blackName = "";
+    let whiteName = "";
     function preload() {
       img["n_pion"] = loadImage("black/n_pion.png");
       img["n_tura"] = loadImage("black/n_tura.png");
@@ -147,8 +159,9 @@
         pieces.push(p2);
       }
     }
+
     function setup() {
-      let canvas = createCanvas(560, 560);
+      let canvas = createCanvas(700, 700);
       canvas.parent("canvas-holder");
       noStroke();
       background(0);
@@ -156,85 +169,103 @@
 
     }
 
-    function draw() {
-      //variabila d este pentru deplasarea verticală, în timp ce i și j sunt pentru desenarea modelului
+    function draw() { //desenarea tablei 
+
 
       background(0);
-      for (let i = 0, d = 1; i < 8; i++) {
+      offsetX = (width - boardSize) / 2;
+      offsetY = (height - boardSize) / 2;
+      blackName = document.getElementById("playerBlack").value;
+      whiteName = document.getElementById("playerWhite").value;
+      restartButton.draw();
+
+      for (let i = 0; i < 8; i++) {
         //bucla orizontala
         for (let j = 0; j < 8; j++) {
           // bucla verticala
-          if (j % 2 != 0) {
-            fill(255);
-            rect(
-              i * (width / 8),
-              j * (height / 8) - d * (height / 8),
-              width / 8,
-              height / 8,
-            );
+          if ((i + j) % 2 == 0) {
+            fill(255); //alb
+          } else {
+            fill(100); //negru
           }
+          rect(
+            offsetX + i * squareSize,
+            offsetY + j * squareSize,
+            squareSize,
+            squareSize
+          );
         }
-        if (i % 2 != 0) {
-          d = 1;
-        } else {
-          d = 0;
-        }
-
       }
 
+
       if (selectedPiece) { //coloreaza fundalul casutei cu galben in momentul in care selectam o piesa
-        let square = width / 8;
+        let square = squareSize;
         fill(255, 255, 0, 150);
         rect(
-          selectedPiece.column * square,
-          selectedPiece.row * square,
+          offsetX + selectedPiece.column * square,
+          offsetY + selectedPiece.row * square,
           square,
           square,
         );
       }
 
-      for (let i = 0; i < pieces.length; i++) { //deseneaza piesele pe tabla
+      for (let i = 0; i < pieces.length; i++) {
         pieces[i].draw();
       }
-      restartButton.draw();
-      //updateNames()
+
     }
-    // function updateNames() {
-    //   let topName = document.querySelector(".top-left");
-    //   let bottomName = document.querySelector(".bottom-left")
 
-    //   let canvas = document.querySelector("#canvas-holder canvas");
-    //   let rect = canvas.getBoundingClientRect()
-
-
-    //   topName.style.left = rect.left + "px";
-    //   topName.style.top = (rect.top - 40) + "px";
-
-    //   bottomName.style.left = rect.left + "px";
-    //   bottomName.style.top = (rect.bottom + 10) + "px";
-
-    // }
 
 
     function mousePressed() { // pentru a muta piesele
-      let square = width / 8;
-      let clickedColumn = Math.floor(mouseX / square);
-      let clickedRow = Math.floor(mouseY / square);
-
-      if (restartButton.checkIfCliked(mouseX, mouseY)) {
-        initPieces();
-        selectedPiece = null;
-        return
+      let square = squareSize;
+      if (
+        mouseX < offsetX || mouseX > offsetX + boardSize ||
+        mouseY < offsetY || mouseY > offsetY + boardSize
+      ) {
+        return;
       }
+      let clickedColumn = Math.floor((mouseX - offsetX) / squareSize);
+      let clickedRow = Math.floor((mouseY - offsetY) / squareSize);
+
+      restartButton.checkIfClicked(() => {   //cand se apasa butonul Restart, se revine la forma initiala
+
+        selectedPiece = null;
+        pieces = []
+        initPieces();
+
+        const black = document.getElementById("playerBlack")
+        const white = document.getElementById("playerWhite")
+
+        black.value = "";
+        white.value = "";
+        black.disabled = false;
+        white.disabled = false;
+
+        blackName = "";
+        whiteName = "";
+        console.log("Hello")
+
+      });
+
 
       let clickedPiece = null;
-
-      for (let i = 0; i < pieces.length; i++) { //ia fiecare piesa si spune daca a fost selectata
-        if (pieces[i].checkIfCliked(mouseX, mouseY)) {
-          clickedPiece = pieces[i]; //piesa este salvata in aici
+      // for (let i = 0; i < pieces.length; i++) { //ia fiecare piesa si spune daca a fost selectata
+      //   if (pieces[i].checkIfCliked(mouseX, mouseY)) {
+      //     clickedPiece = pieces[i]; //piesa este salvata in aici
+      //     break;
+      //   }
+      // }
+      for (let i = 0; i < pieces.length; i++) {
+        if (
+          pieces[i].row === clickedRow &&
+          pieces[i].column === clickedColumn
+        ) {
+          clickedPiece = pieces[i]
           break;
         }
       }
+
 
       if (clickedPiece) {
         if (clickedPiece === selectedPiece) { //selectarea si deselectarea unei piese
