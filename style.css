@@ -1,0 +1,72 @@
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column; /* Aliniem elementele de sus în jos */
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  /* Schimbat în scroll-y doar dacă e nevoie, ca să nu pierdem tabla */
+  overflow-y: auto;
+
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("chess.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; /* Fundalul rămâne nemișcat */
+  font-family: sans-serif;
+}
+
+.top-header {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Centrăm imaginea din header */
+  align-items: center;
+  padding: 10px 0;
+  /* Am scos position: absolute ca să nu se mai suprapună haotic peste joc */
+  margin-bottom: 20px;
+}
+
+.top-header img {
+  height: 100px; /* Redus de la 200px ca să lase loc tablei de șah */
+  object-fit: contain;
+}
+
+.game-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding-bottom: 40px; /* Spațiu jos ca să nu stea lipit de marginea ecranului */
+}
+
+/* #canvas-holder canvas {
+  display: block;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); /* Adaugă o umbră faină în jurul tablei */
+/* border-radius: 4px;
+} */
+#playerBlack,
+#playerWhite {
+  text-align: center;
+  font-size: 18px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.9);
+  width: 250px;
+}
+
+#playerBlack:disabled,
+#playerWhite:disabled {
+  background-color: rgba(150, 150, 150, 0.5);
+  color: #ddd;
+}
+
+#canvas-holder {
+  display: block;
+  width: 700px;
+  height: 700px;
+  min-width: 700px;
+  min-height: 700px;
+  background-color: #111; /* Un fundal gri închis ca să vedem dacă holder-ul în sine apare */
+}
