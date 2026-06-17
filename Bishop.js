@@ -16,4 +16,31 @@ export class Bishop extends Piece {
   get image() {
     return this.#imageName;
   }
+
+  getPossibleMoves(board) {
+    const moves = [];
+
+    for(let i = 0; i < this.directions.length; i++){
+      const dir = this.directions[i];
+      let newRow = this.row + dir.row;
+      let newColumn = this.column + dir.column;
+
+      while (newRow >= 0 && newRow <= 7 && newColumn >= 0 && newColumn <= 7){
+        const target = board[newRow][newColumn];
+
+        if (target === null){
+          moves.push({row: newRow, column: newColumn})
+        } else {
+          if(target.color !== this.color) {
+            moves.push({row: newRow, column:newColumn});
+          }
+          break;
+        }
+
+        newRow = newRow + dir.row;
+        newColumn = newColumn + dir.column;
+      }
+    }
+    return moves;
+  }
 }

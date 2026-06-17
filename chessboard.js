@@ -18,13 +18,16 @@ let selectedPiece = null;
 let currentTurn = "white";
 let board = [];
 
-let canvasWidth = 700;
-let canvasHeight = 700;
+let gameOver = false;
+let winner = null;
 
-// Obiect butoane simplu
+let canvasWidth = 700;
+let canvasHeight = 715;
+
+// Obiect buton restart
 const restartButton = {
   x: 300,
-  y: 660,
+  y: 680,
   width: 100,
   height: 30,
   draw: function () {
@@ -74,6 +77,8 @@ window.draw = function () {
   background(0);
   drawSquares();
   drawPieces();
+  drawCoordinates();
+  drawGameOverMessage();
 };
 
 function initPieces() {
@@ -116,8 +121,8 @@ function initPieces() {
       new Rook("white", 7, 0),
       new Knight("white", 7, 1),
       new Bishop("white", 7, 2),
-      new King("white", 7, 3),
-      new Queen("white", 7, 4),
+      new Queen("white", 7, 3),
+      new King("white", 7, 4),
       new Bishop("white", 7, 5),
       new Knight("white", 7, 6),
       new Rook("white", 7, 7),
@@ -133,7 +138,6 @@ function drawSquares() {
       } else {
         fill(100);
       }
-      // Corectat ordinea: j reprezintă X (coloana), i reprezintă Y (rândul)
       rect(
         offsetX + j * squareSize,
         offsetY + i * squareSize,
@@ -178,6 +182,7 @@ function drawSquares() {
       }
     }
   }
+
   if (document.getElementById("playerBlack")) {
     name.black = document.getElementById("playerBlack").value;
   }
@@ -185,7 +190,6 @@ function drawSquares() {
     name.white = document.getElementById("playerWhite").value;
   }
 
-  // Desenăm butonul de restart doar dacă este definit
   if (typeof restartButton !== "undefined" && restartButton.draw) {
     restartButton.draw();
   }
@@ -196,7 +200,7 @@ function drawPieces() {
     for (let j = 0; j < 8; j++) {
       let piece = board[i][j];
       if (piece != null) {
-        let imgKey = piece.image; // Aceasta returnează acum stringul imaginii (ex: "a_tura.png")
+        let imgKey = piece.image;
         if (img[imgKey]) {
           image(
             img[imgKey],
@@ -211,6 +215,146 @@ function drawPieces() {
   }
 }
 
+function drawCoordinates() {
+  push();
+  fill(255);
+  noStroke();
+  textSize(10);
+  textAlign(CENTER, CENTER);
+
+  const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+
+  for (let i = 0; i < 8; i++) {
+    let x = offsetX + i * squareSize + squareSize / 2;
+    text(letters[i], x, offsetY + boardSize + 15);
+
+    let y = offsetY + i * squareSize + squareSize / 2;
+    text(8 - i, offsetX + boardSize + 15, y);
+  }
+  pop();
+}
+
+// Afișează mesajul de șah-mat peste tablă când jocul s-a terminat
+function drawGameOverMessage() {
+  if (!gameOver) return;
+
+  push();
+  // Fundal semi-transparent peste tot
+  fill(0, 0, 0, 180);
+  rect(0, 0, canvasWidth, canvasHeight);
+
+  // Textul cu câștigătorul
+  fill(255);
+  textSize(36);
+  textAlign(CENTER, CENTER);
+
+  let winnerName;
+  if (winner === "white") {
+    winnerName = "ALB";
+  } else {
+    winnerName = "NEGRU";
+  }
+
+  text("ȘAH-MAT!", canvasWidth / 2, canvasHeight / 2 - 25);
+  textSize(24);
+  text(winnerName + " a câștigat", canvasWidth / 2, canvasHeight / 2 + 15);
+  pop();
+}
+
+// Caută poziția Regelui de culoarea dată
+function findKing(color, board) {
+  for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 8; j++) {
+      const piece = board[i][j];
+      if (piece instanceof King && piece.color === color) {
+        return { row: i, column: j };
+      }
+    }
+  }
+  return null;
+}
+
+// Verifică dacă Regele de culoarea dată e în șah
+function isInCheck(color, board) {
+  // 1. Găsim poziția Regelui de culoarea dată
+  const kingPos = findKing(color, board);
+  if (kingPos === null) return false;
+
+  // 2. Parcurgem toată tabla căutând piese adverse
+  for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 8; j++) {
+      const piece = board[i][j];
+
+
+      if (piece !== null && piece.color !== color) {
+        const enemyMoves = piece.getPossibleMoves(board);
+
+        // 3. Verificăm dacă vreuna dintre mutări ajunge pe Rege
+        for (let k = 0; k < enemyMoves.length; k++) {
+          if (
+            enemyMoves[k].row === kingPos.row &&
+            enemyMoves[k].column === kingPos.column
+          ) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+// Verifică dacă jucătorul de culoare `color` are cel puțin o mutare legală
+function hasAnyLegalMove(color, board) {
+  // Parcurgem toate piesele de culoarea dată
+  for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 8; j++) {
+      const piece = board[i][j];
+
+      if (piece !== null && piece.color === color) {
+        const possibleMoves = piece.getPossibleMoves(board);
+
+        // Încercăm fiecare mutare a piesei
+        for (let k = 0; k < possibleMoves.length; k++) {
+          const move = possibleMoves[k];
+          const originalRow = piece.row;
+          const originalColumn = piece.column;
+          const capturedPiece = board[move.row][move.column];
+
+          board[piece.row][piece.column] = null;
+          piece.row = move.row;
+          piece.column = move.column;
+          board[move.row][move.column] = piece;
+
+          // Verificăm dacă Regele e încă în șah
+          const stillInCheck = isInCheck(color, board);
+
+          board[move.row][move.column] = capturedPiece;
+          piece.row = originalRow;
+          piece.column = originalColumn;
+          board[originalRow][originalColumn] = piece;
+
+          // Dacă Regele NU mai e în șah → am găsit o mutare legală
+          if (!stillInCheck) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+
+  
+  return false;
+}
+
+// Verifică dacă jucătorul e în șah-mat
+function isCheckmate(color, board) {
+  return isInCheck(color, board) && !hasAnyLegalMove(color, board);
+}
+
+
+
 window.mousePressed = function () {
   restartButton.checkIfClicked(() => {
     selectedPiece = null;
@@ -224,7 +368,14 @@ window.mousePressed = function () {
       white.disabled = false;
     }
     currentTurn = "white";
+    gameOver = false;
+    winner = null;
   });
+
+  // Dacă jocul s-a terminat, ignorăm click-urile pe tablă
+  if (gameOver) {
+    return;
+  }
 
   if (
     mouseX < offsetX ||
@@ -237,32 +388,64 @@ window.mousePressed = function () {
 
   let clickedColumn = Math.floor((mouseX - offsetX) / squareSize);
   let clickedRow = Math.floor((mouseY - offsetY) / squareSize);
-
   let clickedPiece = board[clickedRow][clickedColumn];
 
   if (selectedPiece) {
+  
     if (clickedPiece === selectedPiece) {
       selectedPiece = null;
-    } else if (clickedPiece && selectedPiece.color !== clickedPiece.color) {
-      // Captură
-      board[selectedPiece.row][selectedPiece.column] = null;
-      selectedPiece.column = clickedColumn;
-      selectedPiece.row = clickedRow;
-      board[clickedRow][clickedColumn] = selectedPiece;
-      selectedPiece = null;
-      currentTurn = currentTurn === "white" ? "black" : "white"; // Schimbă tura
-    } else if (!clickedPiece) {
-      // Mutare pe căsuță liberă
-      board[selectedPiece.row][selectedPiece.column] = null;
-      selectedPiece.column = clickedColumn;
-      selectedPiece.row = clickedRow;
-      board[clickedRow][clickedColumn] = selectedPiece;
-      selectedPiece = null;
-      currentTurn = currentTurn === "white" ? "black" : "white"; // Schimbă tura
-    } else {
+      return;
+    }
+
+    // Click pe altă piesă proprie → schimbă selecția
+    if (clickedPiece && clickedPiece.color === selectedPiece.color) {
       selectedPiece = clickedPiece;
+      return;
+    }
+
+    // Verificăm dacă mutarea e validă
+    if (selectedPiece.getPossibleMoves) {
+      const possibleMoves = selectedPiece.getPossibleMoves(board);
+
+      let isValid = false;
+      for (let i = 0; i < possibleMoves.length; i++) {
+        if (
+          possibleMoves[i].row === clickedRow &&
+          possibleMoves[i].column === clickedColumn
+        ) {
+          isValid = true;
+          break;
+        }
+      }
+
+      if (!isValid) {
+        return;
+      }
+    }
+
+    // Executăm mutarea (acoperă și captura)
+    board[selectedPiece.row][selectedPiece.column] = null;
+    selectedPiece.row = clickedRow;
+    selectedPiece.column = clickedColumn;
+    board[clickedRow][clickedColumn] = selectedPiece;
+
+    const justMovedColor = selectedPiece.color;
+    selectedPiece = null;
+
+    // Schimbăm tura
+    if (currentTurn === "white") {
+      currentTurn = "black";
+    } else {
+      currentTurn = "white";
+    }
+
+    // Verificăm dacă jucătorul care urmează e în șah-mat
+    if (isCheckmate(currentTurn, board)) {
+      gameOver = true;
+      winner = justMovedColor;
     }
   } else {
+   
     if (clickedPiece && clickedPiece.color === currentTurn) {
       selectedPiece = clickedPiece;
     }

@@ -2,36 +2,24 @@ body {
   margin: 0;
   padding: 0;
   display: flex;
-<<<<<<< HEAD
   flex-direction: column; /* Aliniem elementele de sus în jos */
   align-items: center;
   width: 100%;
   min-height: 100vh;
   /* Schimbat în scroll-y doar dacă e nevoie, ca să nu pierdem tabla */
   overflow-y: auto;
-=======
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  min-height: 100vh;
-  overflow: hidden;
->>>>>>> 0c0fc6d5e39ef370c270d884f5e0ab56b578054b
 
   background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
     url("chess.jpeg");
   background-size: cover;
   background-position: center;
-<<<<<<< HEAD
   background-attachment: fixed; /* Fundalul rămâne nemișcat */
   font-family: sans-serif;
-=======
->>>>>>> 0c0fc6d5e39ef370c270d884f5e0ab56b578054b
 }
 
 .top-header {
   width: 100%;
   display: flex;
-<<<<<<< HEAD
   justify-content: center; /* Centrăm imaginea din header */
   align-items: center;
   padding: 10px 0;
@@ -41,18 +29,6 @@ body {
 
 .top-header img {
   height: 100px; /* Redus de la 200px ca să lase loc tablei de șah */
-=======
-  justify-content: left;
-  align-items: center;
-  padding: 9px 0;
-  position: absolute;
-  top: 0;
-  z-index: 0;
-}
-
-.top-header img {
-  height: 200px;
->>>>>>> 0c0fc6d5e39ef370c270d884f5e0ab56b578054b
   object-fit: contain;
 }
 
@@ -60,7 +36,6 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-<<<<<<< HEAD
   gap: 15px;
   padding-bottom: 40px; /* Spațiu jos ca să nu stea lipit de marginea ecranului */
 }
@@ -94,24 +69,4 @@ body {
   min-width: 700px;
   min-height: 700px;
   background-color: #111; /* Un fundal gri închis ca să vedem dacă holder-ul în sine apare */
-=======
-  gap: 10px;
-  position: relative;
-  z-index: 5;
-}
-#canvas-holder canvas {
-  display: block;
-}
-
-#playerBlack {
-  text-align: center;
-  font-size: 18px;
-  padding: 6px;
-}
-
-#playerWhite {
-  text-align: center;
-  font-size: 18px;
-  padding: 6px;
->>>>>>> 0c0fc6d5e39ef370c270d884f5e0ab56b578054b
 }
