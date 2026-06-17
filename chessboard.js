@@ -211,60 +211,60 @@ function drawPieces() {
   }
 }
 
-// window.mousePressed = function () {
-//   restartButton.checkIfClicked(() => {
-//     selectedPiece = null;
-//     initPieces();
-//     const black = document.getElementById("playerBlack");
-//     const white = document.getElementById("playerWhite");
-//     if (black && white) {
-//       black.value = "";
-//       white.value = "";
-//       black.disabled = false;
-//       white.disabled = false;
-//     }
-//     currentTurn = "white";
-//   });
+window.mousePressed = function () {
+  restartButton.checkIfClicked(() => {
+    selectedPiece = null;
+    initPieces();
+    const black = document.getElementById("playerBlack");
+    const white = document.getElementById("playerWhite");
+    if (black && white) {
+      black.value = "";
+      white.value = "";
+      black.disabled = false;
+      white.disabled = false;
+    }
+    currentTurn = "white";
+  });
 
-//   if (
-//     mouseX < offsetX ||
-//     mouseX > offsetX + boardSize ||
-//     mouseY < offsetY ||
-//     mouseY > offsetY + boardSize
-//   ) {
-//     return;
-//   }
+  if (
+    mouseX < offsetX ||
+    mouseX > offsetX + boardSize ||
+    mouseY < offsetY ||
+    mouseY > offsetY + boardSize
+  ) {
+    return;
+  }
 
-//   let clickedColumn = Math.floor((mouseX - offsetX) / squareSize);
-//   let clickedRow = Math.floor((mouseY - offsetY) / squareSize);
+  let clickedColumn = Math.floor((mouseX - offsetX) / squareSize);
+  let clickedRow = Math.floor((mouseY - offsetY) / squareSize);
 
-//   let clickedPiece = board[clickedRow][clickedColumn];
+  let clickedPiece = board[clickedRow][clickedColumn];
 
-//   if (selectedPiece) {
-//     if (clickedPiece === selectedPiece) {
-//       selectedPiece = null;
-//     } else if (clickedPiece && selectedPiece.color !== clickedPiece.color) {
-//       // Captură
-//       board[selectedPiece.row][selectedPiece.column] = null;
-//       selectedPiece.column = clickedColumn;
-//       selectedPiece.row = clickedRow;
-//       board[clickedRow][clickedColumn] = selectedPiece;
-//       selectedPiece = null;
-//       currentTurn = currentTurn === "white" ? "black" : "white"; // Schimbă tura
-//     } else if (!clickedPiece) {
-//       // Mutare pe căsuță liberă
-//       board[selectedPiece.row][selectedPiece.column] = null;
-//       selectedPiece.column = clickedColumn;
-//       selectedPiece.row = clickedRow;
-//       board[clickedRow][clickedColumn] = selectedPiece;
-//       selectedPiece = null;
-//       currentTurn = currentTurn === "white" ? "black" : "white"; // Schimbă tura
-//     } else {
-//       selectedPiece = clickedPiece;
-//     }
-//   } else {
-//     if (clickedPiece && clickedPiece.color === currentTurn) {
-//       selectedPiece = clickedPiece;
-//     }
-//   }
-// };
+  if (selectedPiece) {
+    if (clickedPiece === selectedPiece) {
+      selectedPiece = null;
+    } else if (clickedPiece && selectedPiece.color !== clickedPiece.color) {
+      // Captură
+      board[selectedPiece.row][selectedPiece.column] = null;
+      selectedPiece.column = clickedColumn;
+      selectedPiece.row = clickedRow;
+      board[clickedRow][clickedColumn] = selectedPiece;
+      selectedPiece = null;
+      currentTurn = currentTurn === "white" ? "black" : "white"; // Schimbă tura
+    } else if (!clickedPiece) {
+      // Mutare pe căsuță liberă
+      board[selectedPiece.row][selectedPiece.column] = null;
+      selectedPiece.column = clickedColumn;
+      selectedPiece.row = clickedRow;
+      board[clickedRow][clickedColumn] = selectedPiece;
+      selectedPiece = null;
+      currentTurn = currentTurn === "white" ? "black" : "white"; // Schimbă tura
+    } else {
+      selectedPiece = clickedPiece;
+    }
+  } else {
+    if (clickedPiece && clickedPiece.color === currentTurn) {
+      selectedPiece = clickedPiece;
+    }
+  }
+};
