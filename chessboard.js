@@ -504,31 +504,71 @@ window.mousePressed = function () {
       return;
     }
 
-    // Verificăm dacă mutarea e validă
-    if (selectedPiece.getPossibleMoves) {
-      const possibleMoves = selectedPiece.getPossibleMoves(board);
+    // Verificăm dacă mutarea e validă (filtrăm și mutările care lasă Regele în șah)
+    const possibleMoves = selectedPiece.getPossibleMoves(board).filter((move) => {
+      const originalRow = selectedPiece.row;
+      const originalColumn = selectedPiece.column;
+      const capturedPiece = board[move.row][move.column];
 
-      let isValid = false;
-      for (let i = 0; i < possibleMoves.length; i++) {
-        if (
-          possibleMoves[i].row === clickedRow &&
-          possibleMoves[i].column === clickedColumn
-        ) {
-          isValid = true;
-          break;
-        }
-      }
+      board[originalRow][originalColumn] = null;
+      selectedPiece.row = move.row;
+      selectedPiece.column = move.column;
+      board[move.row][move.column] = selectedPiece;
 
-      if (!isValid) {
-        return;
+      const inCheck = isInCheck(selectedPiece.color, board);
+
+      board[move.row][move.column] = capturedPiece;
+      selectedPiece.row = originalRow;
+      selectedPiece.column = originalColumn;
+      board[originalRow][originalColumn] = selectedPiece;
+
+      return !inCheck;
+    });
+
+    let isValid = false;
+    for (let i = 0; i < possibleMoves.length; i++) {
+      if (
+        possibleMoves[i].row === clickedRow &&
+        possibleMoves[i].column === clickedColumn
+      ) {
+        isValid = true;
+        break;
       }
     }
 
+    if (!isValid) {
+      return;
+    }
+
     // Executăm mutarea (acoperă și captura)
+    const move = possibleMoves.find(m => m.row === clickedRow && m.column === clickedColumn);
+
+
     board[selectedPiece.row][selectedPiece.column] = null;
     selectedPiece.row = clickedRow;
     selectedPiece.column = clickedColumn;
     board[clickedRow][clickedColumn] = selectedPiece;
+
+    if(move && move.castling){
+      const row = clickedRow;
+      if(move.castling === "small"){
+        const rook = board[row][7];
+        board[row][7] = null;
+        rook.column = 5;
+        board[row][5] = rook;
+        rook.hasMoved = true;
+      }else if (move.castling === "big") {
+        const rook = board [row][0]
+        board[row][0] = null;
+        rook.column = 3;
+        board[row][3] = rook;
+        rook.hasMoved = true;
+      }
+    }
+
+    if(selectedPiece instanceof King || selectedPiece instanceof Rook){
+      selectedPiece.hasMoved = true;
+    }
 
     const justMovedColor = selectedPiece.color;
     selectedPiece = null;
@@ -610,9 +650,32 @@ function makeComputerMoveEasy() {
     piece.column = move.column;
     board[move.row][move.column] = piece;
 
+    if (move.castling) {
+      const row = move.row;
+      if (move.castling === "small") {
+        const rook = board[row][7];
+        board[row][7] = null;
+        rook.column = 5;
+        board[row][5] = rook;
+        rook.hasMoved = true;
+      } else if (move.castling === "big") {
+        const rook = board[row][0];
+        board[row][0] = null;
+        rook.column = 3;
+        board[row][3] = rook;
+        rook.hasMoved = true;
+      }
+    }
+    if (piece instanceof King || piece instanceof Rook) {
+      piece.hasMoved = true;
+    }
+
     if (isCheckmate("white", board)) {
       gameOver = true;
       winner = "black";
+    } else if (isStalemate("white", board)) {
+      gameOver = true;
+      winner = "draw";
     }
     currentTurn = "white";
   } else {
@@ -775,9 +838,33 @@ function makeComputerMoveMedium() {
     piece.row = move.row;
     piece.column = move.column;
     board[move.row][move.column] = piece;
+
+    if (move.castling) {
+      const row = move.row;
+      if (move.castling === "small") {
+        const rook = board[row][7];
+        board[row][7] = null;
+        rook.column = 5;
+        board[row][5] = rook;
+        rook.hasMoved = true;
+      } else if (move.castling === "big") {
+        const rook = board[row][0];
+        board[row][0] = null;
+        rook.column = 3;
+        board[row][3] = rook;
+        rook.hasMoved = true;
+      }
+    }
+    if (piece instanceof King || piece instanceof Rook) {
+      piece.hasMoved = true;
+    }
+
     if (isCheckmate("white", board)) {
       gameOver = true;
       winner = "black";
+    } else if (isStalemate("white", board)) {
+      gameOver = true;
+      winner = "draw";
     }
     currentTurn = "white";
   } else {

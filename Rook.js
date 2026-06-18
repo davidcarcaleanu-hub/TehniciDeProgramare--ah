@@ -9,6 +9,7 @@ export class Rook extends Piece {
   ];
   constructor(color, row, column) {
     super(color, row, column);
+    this.hasMoved = false;
     this.#imageName = color == "white" ? "a_tura.png" : "n_tura.png";
   }
 
