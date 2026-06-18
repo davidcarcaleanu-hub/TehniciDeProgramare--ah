@@ -6,9 +6,13 @@ import { King } from "./King.js";
 import { Pawn } from "./Pawn.js";
 import { makeComputerMoveEasy, makeComputerMoveMedium } from "./machine.js";
 import { handleMousePressed } from "./input.js";
-import { drawSquares, drawPieces, drawCoordinates, drawGameOverMessage } from "./renderer.js";
+import {
+  drawSquares,
+  drawPieces,
+  drawCoordinates,
+  drawGameOverMessage,
+} from "./renderer.js";
 import { img } from "./config.js";
-
 
 let selectedPiece = null;
 let currentTurn = "white";
@@ -98,9 +102,34 @@ window.setup = function () {
       });
     }
   }
-
 };
 
+async function computerThinkingAsync(gameMode) {
+  try {
+    // Creăm promisiunea direct aici, folosind funcțiile tale originale din machine.js
+    const result = await new Promise((resolve) => {
+      setTimeout(() => {
+        if (gameMode === "ai_medium") {
+          // Apelăm direct funcția pentru modul mediu
+          resolve(makeComputerMoveMedium(board));
+        } else {
+          // Apelăm direct funcția pentru modul ușor
+          resolve(makeComputerMoveEasy(board));
+        }
+      }, 1000);
+    });
+
+    // Când e gata, actualizăm variabilele globale
+    gameOver = result.gameOver;
+    winner = result.winner;
+    currentTurn = result.currentTurn;
+  } catch (error) {
+    console.error("Eroare la IA:", error);
+    currentTurn = "white";
+  }
+}
+
+// Funcția draw rămâne normală, curată, ca să nu se mai facă ecranul negru
 window.draw = function () {
   background(0);
   drawSquares(board, selectedPiece, restartButton);
@@ -108,25 +137,27 @@ window.draw = function () {
   drawCoordinates();
   drawGameOverMessage(gameOver, winner, canvasWidth, canvasHeight);
 
+  if (currentTurn === "computer_thinking") {
+    push();
+    fill(0, 0, 0, 50);
+    rect(50, 50, 600, 600);
+
+    fill(255);
+    textSize(20);
+    textAlign(CENTER, CENTER);
+    text("Calculatorul gândește...", canvasWidth / 2, canvasHeight / 2);
+    pop();
+  }
+
   const urlParams = new URLSearchParams(window.location.search);
   const gameMode = urlParams.get("mode");
+
   if (currentTurn === "black" && !gameOver) {
-    if (gameMode === "ai") {
-      setTimeout(() => {
-        const result = makeComputerMoveEasy(board);
-        gameOver = result.gameOver;
-        winner = result.winner;
-        currentTurn = result.currentTurn;
-      }, 800);
+    if (gameMode === "ai" || gameMode === "ai_medium") {
       currentTurn = "computer_thinking";
-    } else if (gameMode == "ai_medium") {
-      setTimeout(() => {
-        const result = makeComputerMoveMedium(board);
-        gameOver = result.gameOver;
-        winner = result.winner;
-        currentTurn = result.currentTurn;
-      }, 800);
-      currentTurn = "computer_thinking";
+
+      // Apelăm funcția asincronă cu async/await creată mai sus
+      computerThinkingAsync(gameMode);
     }
   }
 };
@@ -193,7 +224,3 @@ window.mousePressed = function () {
   gameOver = result.gameOver;
   winner = result.winner;
 };
-
-
-
-
