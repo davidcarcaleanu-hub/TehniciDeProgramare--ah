@@ -71,6 +71,82 @@ window.setup = function () {
   noStroke();
   initPieces();
   currentTurn = "white";
+
+  function lockInputOnEnter(id) {
+    document.getElementById(id).addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        this.disabled = true;
+      }
+    });
+  }
+  lockInputOnEnter("playerBlack");
+  lockInputOnEnter("playerWhite");
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const gameMode = urlParams.get("mode");
+
+  if (gameMode == "ai" || gameMode === "ai_medium") {
+    const blackInput = document.getElementById("playerBlack");
+    const whiteInput = document.getElementById("playerWhite");
+
+    if (blackInput) {
+      blackInput.value =
+        gameMode === "ai_medium" ? "Calculator (mediu)" : "Calculator (ușor)";
+      blackInput.disabled = true;
+    }
+    if (whiteInput) {
+      whiteInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          this.disabled = true;
+        }
+      });
+    }
+  }
+
+  // const urlParams = new URLSearchParams(window.location.search);
+  // const gameMode = urlParams.get("mode");
+  // const whiteInput = document.getElementById("playerWhite");
+  // const blackInput = document.getElementById("playerBlack");
+
+  // if (gameMode !== "ai") {
+  //   function lockInputOnEnter(id) {
+  //     const inputElement = document.getElementById(id);
+  //     if (inputElement) {
+  //       inputElement.addEventListener("keydown", function (e) {
+  //         if (e.key === "Enter") {
+  //           this.disabled = true;
+  //         }
+  //       });
+  //     }
+  //   }
+  //   lockInputOnEnter("playerWhite");
+  //   lockInputOnEnter("playerBlack");
+  // } else {
+  //   if (whiteInput) {
+  //     whiteInput.addEventListener("keydown", function (e) {
+  //       if (e.key === "Enter" && this.value.trim() !== "") {
+  //         this.disabled = true;
+
+  //         if (blackInput) {
+  //           blackInput.value = "Computer";
+  //           blackInput.disabled = true;
+  //         }
+  //       }
+  //     });
+  //   }
+  //   if (blackInput) {
+  //     blackInput.addEventListener("keydown", function (e) {
+  //       if (e.key === "Enter" && this.value.trim() !== "") {
+  //         this.disabled = true;
+
+  //         if (whiteInput) {
+  //           whiteInput.value = "Computer";
+  //           whiteInput.disabled = true;
+  //         }
+  //       }
+  //     });
+  //   }
+  // }
 };
 
 window.draw = function () {
@@ -79,6 +155,18 @@ window.draw = function () {
   drawPieces();
   drawCoordinates();
   drawGameOverMessage();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const gameMode = urlParams.get("mode");
+  if (currentTurn === "black" && !gameOver) {
+    if (gameMode === "ai") {
+      setTimeout(makeComputerMoveEasy, 800);
+      currentTurn = "computer_thinking";
+    } else if (gameMode == "ai_medium") {
+      setTimeout(makeComputerMoveMedium, 800);
+      currentTurn = "computer_thinking";
+    }
+  }
 };
 
 function initPieces() {
@@ -285,7 +373,6 @@ function isInCheck(color, board) {
     for (let j = 0; j < 8; j++) {
       const piece = board[i][j];
 
-
       if (piece !== null && piece.color !== color) {
         const enemyMoves = piece.getPossibleMoves(board);
 
@@ -344,7 +431,6 @@ function hasAnyLegalMove(color, board) {
     }
   }
 
-  
   return false;
 }
 
@@ -353,8 +439,6 @@ function isCheckmate(color, board) {
   return isInCheck(color, board) && !hasAnyLegalMove(color, board);
 }
 
-
-
 window.mousePressed = function () {
   restartButton.checkIfClicked(() => {
     selectedPiece = null;
@@ -362,10 +446,16 @@ window.mousePressed = function () {
     const black = document.getElementById("playerBlack");
     const white = document.getElementById("playerWhite");
     if (black && white) {
-      black.value = "";
       white.value = "";
-      black.disabled = false;
       white.disabled = false;
+
+      if (gameMode === "ai") {
+        black.value = "Computer";
+        black.disabled = true;
+      } else {
+        black.value = "";
+        black.disabled = false;
+      }
     }
     currentTurn = "white";
     gameOver = false;
@@ -391,7 +481,6 @@ window.mousePressed = function () {
   let clickedPiece = board[clickedRow][clickedColumn];
 
   if (selectedPiece) {
-  
     if (clickedPiece === selectedPiece) {
       selectedPiece = null;
       return;
@@ -445,9 +534,245 @@ window.mousePressed = function () {
       winner = justMovedColor;
     }
   } else {
-   
     if (clickedPiece && clickedPiece.color === currentTurn) {
       selectedPiece = clickedPiece;
     }
   }
 };
+
+function makeComputerMoveEasy() {
+  let computerPieces = [];
+
+  for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 8; j++) {
+      let piece = board[i][j];
+      if (piece !== null && piece.color === "black") {
+        computerPieces.push(piece);
+      }
+    }
+  }
+
+  let allValidMoves = [];
+  for (let i = 0; i < computerPieces.length; i++) {
+    let piece = computerPieces[i];
+    let possibleMoves = piece.getPossibleMoves(board);
+
+    let safeMoves = possibleMoves.filter((move) => {
+      const originalRow = piece.row;
+      const originalColumn = piece.column;
+      const capturedPiece = board[move.row][move.column];
+
+      board[originalRow][originalColumn] = null;
+      piece.row = move.row;
+      piece.column = move.column;
+      board[move.row][move.column] = piece;
+
+      const stillInCheck = isInCheck("black", board);
+
+      board[move.row][move.column] = capturedPiece;
+      piece.row = originalRow;
+      piece.column = originalColumn;
+      board[originalRow][originalColumn] = piece;
+
+      return !stillInCheck;
+    });
+
+    for (let j = 0; j < safeMoves.length; j++) {
+      allValidMoves.push({
+        piece: piece,
+        targetMove: safeMoves[j],
+      });
+    }
+  }
+  if (allValidMoves.length > 0) {
+    let randomIndex = Math.floor(Math.random() * allValidMoves.length);
+    let chosen = allValidMoves[randomIndex];
+    let piece = chosen.piece;
+    let move = chosen.targetMove;
+
+    board[piece.row][piece.column] = null;
+    piece.row = move.row;
+    piece.column = move.column;
+    board[move.row][move.column] = piece;
+
+    if (isCheckmate("white", board)) {
+      gameOver = true;
+      winner = "black";
+    }
+    currentTurn = "white";
+  } else {
+    // Dacă negrul nu mai are nicio mutare validă dar nu e în șah, este remiză (pat)
+    if (isInCheck("black", board)) {
+      gameOver = true;
+      winner = "white"; // Șah-mat, câștigă albul
+    } else {
+      gameOver = true;
+      winner = "draw"; // Remiză
+    }
+
+    currentTurn = "white";
+  }
+}
+
+//Modul mediu - backtracking
+function evaluateBoard(currentBoard) {
+  let score = 0;
+  const pieceValues = {
+    Pawn: 10,
+    Knight: 30,
+    Bishop: 30,
+    Rook: 50,
+    Queen: 90,
+    King: 9000,
+  };
+  for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 8; j++) {
+      let piece = currentBoard[i][j];
+      if (piece !== null) {
+        let type = piece.constructor.name;
+        let value = pieceValues[type] || 0;
+        if (piece.color === "white") score += value;
+        else score -= value;
+      }
+    }
+  }
+  return score;
+}
+
+function minimax(currentBoard, depth, isMaximizingPlayer) {
+  if (depth === 0) return evaluateBoard(currentBoard);
+  let activatePieces = [];
+  let colorTurn = isMaximizingPlayer ? "white" : "black";
+  for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 8; j++) {
+      let p = currentBoard[i][j];
+      if (p !== null && p.color === colorTurn) activatePieces.push(p);
+    }
+  }
+  if (isMaximizingPlayer) {
+    let maxEval = -Infinity;
+    for (let p of activatePieces) {
+      let moves = p.getPossibleMoves(currentBoard);
+      for (let move of moves) {
+        let originalRow = p.row;
+        let originalCol = p.column;
+        let captured = currentBoard[move.row][move.column];
+        currentBoard[originalRow][originalCol] = null;
+        p.row = move.row;
+        p.column = move.column;
+        currentBoard[move.row][move.column] = p;
+        if (!isInCheck("white", currentBoard)) {
+          let nextBoardCopy = currentBoard.map((row) =>
+            row.map((p) =>
+              p
+                ? Object.assign(Object.create(Object.getPrototypeOf(p)), p)
+                : null
+            )
+          );
+          let evaluation = minimax(nextBoardCopy, depth - 1, false);
+          maxEval = Math.max(maxEval, evaluation);
+        }
+        currentBoard[move.row][move.column] = captured;
+        p.row = originalRow;
+        p.column = originalCol;
+        currentBoard[originalRow][originalCol] = p;
+      }
+    }
+    return maxEval == -Infinity ? evaluateBoard(currentBoard) : maxEval;
+  } else {
+    let minEval = Infinity;
+    for (let p of activePieces) {
+      let moves = p.getPossibleMoves(currentBoard);
+      for (let move of moves) {
+        let originalRow = p.row;
+        let originalCol = p.column;
+        let captured = currentBoard[move.row][move.column];
+        currentBoard[originalRow][originalCol] = null;
+        p.row = move.row;
+        p.column = move.column;
+        currentBoard[move.row][move.column] = p;
+        if (!isInCheck("black", currentBoard)) {
+          let nextBoardCopy = currentBoard.map((row) =>
+            row.map((p) =>
+              p
+                ? Object.assign(Object.create(Object.getPrototypeOf(p)), p)
+                : null
+            )
+          );
+          let evaluation = minimax(nextBoardCopy, depth - 1, true);
+          minEval = Math.min(minEval, evaluation);
+        }
+        currentBoard[move.row][move.column] = captured;
+        p.row = originalRow;
+        p.column = originalCol;
+        currentBoard[originalRow][originalCol] = p;
+      }
+    }
+    return minEval === Infinity ? evaluateBoard(currentBoard) : minEval;
+  }
+}
+
+function makeComputerMoveMedium() {
+  let computerPieces = [];
+  for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 8; j++) {
+      let piece = board[i][j];
+      if (piece !== null && piece.color === "black") computerPieces.push(piece);
+    }
+  }
+  let bestMove = null;
+  let bestScore = Infinity;
+  for (let i = 0; i < computerPieces.length; i++) {
+    let piece = computerPieces[i];
+    let possibleMoves = piece.getPossibleMoves(board);
+    for (let j = 0; j < possibleMoves.length; j++) {
+      let move = possibleMoves[j];
+      const originalRow = piece.row;
+      const originalColumn = piece.column;
+      const capturedPiece = board[move.row][move.column];
+      board[originalRow][originalColumn] = null;
+      piece.row = move.row;
+      piece.column = move.column;
+      board[move.row][move.column] = piece;
+      if (!isInCheck("black", board)) {
+        let boardCopy = board.map((row) =>
+          row.map((p) =>
+            p ? Object.assign(Object.create(Object.getPrototypeOf(p)), p) : null
+          )
+        );
+        let score = minimax(boardCopy, 1, true);
+
+        if (score < bestScore) {
+          bestScore = score;
+          bestMove = { piece, move };
+        }
+      }
+      board[move.row][move.column] = capturedPiece;
+      piece.row = originalRow;
+      piece.column = originalColumn;
+      board[originalRow][originalColumn] = piece;
+    }
+  }
+  if (bestMove !== null) {
+    let piece = bestMove.piece;
+    let move = bestMove.move;
+    board[piece.row][piece.column] = null;
+    piece.row = move.row;
+    piece.column = move.column;
+    board[move.row][move.column] = piece;
+    if (isCheckmate("white", board)) {
+      gameOver = true;
+      winner = "black";
+    }
+    currentTurn = "white";
+  } else {
+    if (isInCheck("black", board)) {
+      gameOver = true;
+      winner = "white";
+    } else {
+      gameOver = true;
+      winner = "draw";
+    }
+    currentTurn = "white";
+  }
+}

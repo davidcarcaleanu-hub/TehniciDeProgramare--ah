@@ -1,30 +1,105 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chess - Project</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Chess Project - Control Panel</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("chess.jpeg");
+            background-size: cover;
+            background-position: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+        }
+
+        .panel-container {
+            background-color: rgba(0, 0, 0, 0.75);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 32px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            color: #ccc;
+            font-size: 16px;
+            margin-bottom: 35px;
+        }
+
+        .menu-options {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .btn-option {
+            background-color: rgbs(255, 255, 255, 0.9);
+            color: #111;
+            border: none;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+        }
+
+        .btn-option:hover {
+            background-color: #ffd477;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgbs(255, 212, 119, 0.4);
+        }
+
+        .btn-option.disabled {
+            background-color: rgba(100, 100, 100, 0.5);
+            color: #888;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-option.disabled:hover {
+            background-color: rgba(100, 100, 100, 0.5);
+            color: #888
+        }
+    </style>
 </head>
 
 <body>
-  <header class="top-header">
-    <img src="Sah2.jpeg" alt="chess header">
-  </header>
+    <div class="panel-container">
+        <h1> Șah - Meniu </h1>
+        <p class="subtitle">Alege modul de joc</p>
 
-  <div class="game-wrapper">
-    <input id="playerBlack" placeholder="Nume Jucător Negru" />
-    <div id="canvas-holder"></div>
-    <input id="playerWhite" placeholder="Nume Jucător Alb" />
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.min.js"></script>
-  <script type="module" src="./chessboard.js"> </script>
+        <div class="menu-options">
+            <a href="game.html?mode=pvp" class="btn-option"> Jucǎtor vs Jucǎtor</a>
+            <a href="game.html?mode=ai" class="btn-option"> Jucǎtor vs Calculator (Ușor)</a>
+            <a href="game.html?mode=ai_medium" class="btn-option"> Jucǎtor vs Calculator (Mediu)</a>
 
 
-
+        </div>
+    </div>
 </body>
 
 </html>
