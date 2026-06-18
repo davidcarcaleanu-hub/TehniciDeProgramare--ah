@@ -336,6 +336,11 @@ function drawGameOverMessage() {
   textSize(36);
   textAlign(CENTER, CENTER);
 
+  if (winner === "draw"){
+    text("Pat!", canvasWidth / 2, canvasHeight / 2 - 25);
+    textSize(24)
+    text("Remiza", canvasWidth / 2, canvasHeight / 2 + 15)
+  }else {
   let winnerName;
   if (winner === "white") {
     winnerName = "ALB";
@@ -346,6 +351,7 @@ function drawGameOverMessage() {
   text("ȘAH-MAT!", canvasWidth / 2, canvasHeight / 2 - 25);
   textSize(24);
   text(winnerName + " a câștigat", canvasWidth / 2, canvasHeight / 2 + 15);
+}
   pop();
 }
 
@@ -439,7 +445,13 @@ function isCheckmate(color, board) {
   return isInCheck(color, board) && !hasAnyLegalMove(color, board);
 }
 
+function isStalemate(color, board) {
+  return !isInCheck(color, board) && !hasAnyLegalMove(color, board);
+}
 window.mousePressed = function () {
+  const urlParams = new URLSearchParams(window.location.search);
+  const gameMode = urlParams.get("mode");
+
   restartButton.checkIfClicked(() => {
     selectedPiece = null;
     initPieces();
@@ -528,10 +540,13 @@ window.mousePressed = function () {
       currentTurn = "white";
     }
 
-    // Verificăm dacă jucătorul care urmează e în șah-mat
-    if (isCheckmate(currentTurn, board)) {
+    if (isCheckmate(currentTurn, board)){
       gameOver = true;
       winner = justMovedColor;
+    }
+    else if (isStalemate(currentTurn, board)){
+      gameOver = true
+      winner = "draw"
     }
   } else {
     if (clickedPiece && clickedPiece.color === currentTurn) {
@@ -681,7 +696,7 @@ function minimax(currentBoard, depth, isMaximizingPlayer) {
     return maxEval == -Infinity ? evaluateBoard(currentBoard) : maxEval;
   } else {
     let minEval = Infinity;
-    for (let p of activePieces) {
+    for (let p of activatePieces) {
       let moves = p.getPossibleMoves(currentBoard);
       for (let move of moves) {
         let originalRow = p.row;
