@@ -245,7 +245,22 @@ function drawSquares() {
         }
 
         if (selectedPiece.getPossibleMoves) {
-          for (const move of selectedPiece.getPossibleMoves(board)) {
+          const legalMoves = selectedPiece.getPossibleMoves(board).filter((move) => {
+            const origRow = selectedPiece.row;
+            const origCol = selectedPiece.column;
+            const captured = board[move.row][move.column];
+            board[origRow][origCol] = null;
+            selectedPiece.row = move.row;
+            selectedPiece.column = move.column;
+            board[move.row][move.column] = selectedPiece;
+            const inCheck = isInCheck(selectedPiece.color, board);
+            board[move.row][move.column] = captured;
+            selectedPiece.row = origRow;
+            selectedPiece.column = origCol;
+            board[origRow][origCol] = selectedPiece;
+            return !inCheck;
+          });
+          for (const move of legalMoves) {
             if (move.row == i && move.column == j) {
               fill("#ffe8b599");
               rect(
